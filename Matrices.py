@@ -7,10 +7,16 @@ In 4 words: 闲着无聊
 import numpy as np
 from numpy import array as arr
 
+
 # TODO : INVERSE, COFACTOR, ADJOINT
 
 class Matrix:
     num_of_matrix = 0
+    example_matrix = arr(
+        [[1, 0, 0],
+         [5, 1, 0],
+         [0, -3, 1]]
+    )
 
     def __init__(self, mat, shape=None):
         if mat is not None:
@@ -101,12 +107,14 @@ class Matrix:
     Transpose = Interhange row and column
     Get the transpose matrix of this matrix
     '''
+
     def transpose(self):
         return self.__internal_transpose
 
     '''
     Get the adjoint matrix of this matrix
     '''
+
     def adj(self, inplace=False):
         adj = self.__internal_adj()
         if inplace:
@@ -116,6 +124,7 @@ class Matrix:
     '''
     Get the cofactor matrix of this matrix
     '''
+
     def cof(self, inplace=False):
         cof = self.__internal_cof()
         if inplace:
@@ -125,6 +134,7 @@ class Matrix:
     """
     Using matplotlib to plot matrix
     """
+
     def matplot(self):
         pass
 
