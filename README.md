@@ -1,2 +1,1 @@
-# Matrix
-Matrix class in python
+**Matrix Class**
