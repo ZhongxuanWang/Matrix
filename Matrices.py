@@ -14,7 +14,6 @@ class Matrix:
     __version__ = '1.1'
     __author__ = 'Daniel Wang'
 
-    num_of_matrix = 0
     example_2d_matrix = arr(
         [[4, 1],
          [3, 2]]
@@ -26,9 +25,9 @@ class Matrix:
     )
     example_4d_matrix = arr(
         [[2, -1, 0, 0],
-        [-1, 2, -1, 0],
-        [0, -2, 2, -1],
-        [0, 0, -1, 2]]
+         [-1, 2, -1, 0],
+         [0, -2, 2, -1],
+         [0, 0, -1, 2]]
     )
 
     def __init__(self, mat, shape=None):
@@ -40,18 +39,16 @@ class Matrix:
         else:
             assert shape is not None, 'When the matrix is not given, the shape cant be empty!'
             self.mat = self.identity(shape)
-        self.nrows = self.ndim = len(mat)
-        self.ncols = len(mat[0])
-        self.shape = (self.nrows, self.ncols)
-
-        Matrix.num_of_matrix += 1
-        self.my_num = Matrix.num_of_matrix
 
     def get_mat(self):
         return self.__mat
 
     def set_mat(self, other):
         assert len(other) > 0, 'The matrix cant be empty'
+        self.nrows = self.ndim = len(other)
+        self.ncols = len(other[0])
+        self.shape = (self.nrows, self.ncols)
+
         self.__mat = np.array(other)
 
     mat = property(get_mat, set_mat)
@@ -275,6 +272,7 @@ class Matrix:
     def randint(min, max, shape):
         assert shape[0] > 0 and shape[1] > 0, 'The number of rows and columns must be bigger than 0!'
         return Matrix(mat=np.random.randint(min, max, size=shape))
+
 
 class Array:
     pass

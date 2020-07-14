@@ -21,7 +21,7 @@ def main():
         [0, -2, 2, -1],
         [0, 0, -1, 2]
     ])
-    print(m1.inv())
+    print(m1.__dict__)
 
     # print("Printing out the content")
     # print(mat1, "\n", mat2)
