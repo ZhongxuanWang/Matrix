@@ -62,6 +62,12 @@ class Matrix:
     def __add__(self, other):
         return self.__internal_add(other)
 
+    def __pow__(self, power, modulo=None):
+        m = self.mat
+        for a in range(power):
+            m = self.__internal_dot(m)
+        return m
+
     def __abs__(self):
         return self.det()
 
@@ -71,12 +77,6 @@ class Matrix:
 
     def __len__(self):
         return self.nrows
-
-    def __pow__(self, power, modulo=None):
-        m = self.mat
-        for a in range(power):
-            m = self.__internal_dot(m)
-        return m
 
     def to_list(self):
         return self.mat.tolist()
@@ -94,24 +94,27 @@ class Matrix:
         return result
 
     def inv(self):
-        assert self.det() is not 0, 'only matrix with none-zero determinant have its inverse matrix!'
+        det = self.det()
+        assert det is not 0, 'only matrix with none-zero determinant have its inverse matrix!'
         row = len(self.mat)
         col = len(self.mat[0])
         # Make sure it's a square
         assert row == col
-        return self.__internal_inv()
+        return self.__internal_inv(det)
 
-    def det(self):
+    def det(self, limit=None):
         row = len(self.mat)
         col = len(self.mat[0])
         # Make sure it's a square
         assert row == col, 'only squared matrix have determinant!'
+        if limit is None:
+            limit = 1000000
         # Edge cases
-        if 997 < row < 1000000:
+        if 997 < row < limit:
             import sys
             sys.setrecursionlimit(row + 2)
-        elif row > 1000000:
-            raise Exception("Row/Col number exceeded")
+        elif row > limit:
+            raise Exception("Row/Col number exceeded limit.")
         return self.__internal_det(list(self.mat))
 
     '''
@@ -119,8 +122,11 @@ class Matrix:
     Get the transpose matrix of this matrix
     '''
 
-    def transpose(self):
-        return self.__internal_transpose
+    def transpose(self, other=None, inplace=False):
+        nm = self.__internal_transpose(other)
+        if inplace:
+            self.mat = nm
+        return nm
 
     '''
     Get the adjoint matrix of this matrix
@@ -160,7 +166,7 @@ class Matrix:
 
             nrow_of_mat, ncol_of_new_mat = len(self.mat), len(nm[0])
 
-            new_mat = self.zeros(nrow_of_mat, ncol_of_new_mat, frame=True)
+            new_mat = self.fill((nrow_of_mat, ncol_of_new_mat))
 
             for row in range(nrow_of_mat):
                 for col in range(ncol_of_new_mat):
@@ -171,17 +177,18 @@ class Matrix:
             return new_mat
 
     def __internal_add(self, nm):
-        if isinstance(nm, (int, float, bool)):
+        if isinstance(nm, (int, float, bool, arr)):
             return self.mat + nm
         else:
-            assert len(self.mat) == len(nm) and len(self.mat[0]) == len(nm[0])
-            for row in range(len(nm)):
-                for col in range(len(nm[0])):
-                    nm[row][col] += self.mat[row][col]
-            return nm
+            return self.mat + arr(nm)
+            # assert len(self.mat) == len(nm) and len(self.mat[0]) == len(nm[0])
+            # for row in range(len(nm)):
+            #     for col in range(len(nm[0])):
+            #         nm[row][col] += self.mat[row][col]
+            # return nm
 
-    def __internal_inv(self):
-        pass
+    def __internal_inv(self, det):
+        return self.adj() / det
 
     """
     Precondition: 
@@ -209,26 +216,31 @@ class Matrix:
     #                 changed_matrix = nm[r][c]
     #     return changed_matrix
 
-    def __internal_transpose(self):
-        new_mat = Matrix.zeros(len(self.mat[0]), len(self.mat))
-        for a in range(len(self.mat[0])):
-            new_mat[a] = self.mat[:, 0]
+    def __internal_transpose(self, mat):
+        if mat is None:
+            mat = self.mat
+        new_mat = Matrix.zeros((len(mat[0]), len(mat)))
+        for a in range(len(mat[0])):
+            new_mat[a] = mat[:, a]
         return new_mat
 
     def __internal_adj(self):
-
-        return self.mat
-        pass
+        return self.__internal_transpose(self.__internal_cof())
 
     def __internal_cof(self):
-        return self.mat
-        pass
+        nrows, ncols = len(self.mat), len(self.mat[0])
+        nm = Matrix.fill((nrows, ncols), 0)
+        for row in range(nrows):
+            for col in range(ncols):
+                nm[row][col] = (-1) ** (2 + row + col) * \
+                               self.__internal_det(np.delete(np.delete(self.mat, row, 0), col, 1))
+        return nm
 
     @staticmethod
-    def identity(*dimension):
-        assert 0 < len(dimension) < 3
-        a = Matrix.zeros(*dimension)
-        row, col = Matrix.getrc(*dimension)
+    def identity(shape):
+        row, col = shape
+        assert row > 0 and col > 0
+        a = Matrix.zeros(shape)
         for i in range(row):
             for j in range(col):
                 if i == j:
@@ -236,32 +248,18 @@ class Matrix:
         return a
 
     @staticmethod
-    def zeros(*dimension, frame=False):
-        assert 0 < len(dimension) < 3
-        row, col = Matrix.getrc(*dimension)
-        if frame:
-            var = None
-        else:
-            var = 0
-        return arr([[var for _ in range(col)] for _ in range(row)])
+    def fill(shape, content=None):
+        row, col = shape
+        assert row > 0 and col > 0
+        return arr([[content for _ in range(col)] for _ in range(row)])
 
     @staticmethod
-    def ones(*dimension, frame=False):
-        assert 0 < len(dimension) < 3
-        row, col = Matrix.getrc(*dimension)
-        if frame:
-            var = None
-        else:
-            var = 1
-        return arr([[var for _ in range(col)] for _ in range(row)])
+    def zeros(shape):
+        return Matrix.fill(shape, content=0)
 
     @staticmethod
-    def getrc(*dimension):
-        if len(dimension) > 1:
-            row, col = dimension
-        else:
-            col, row = dimension[0]
-        return row, col
+    def ones(shape):
+        return Matrix.fill(shape, content=1)
 
     @staticmethod
     def rand(shape):

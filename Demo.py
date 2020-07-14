@@ -16,12 +16,12 @@ def main():
     mat5 = Matrix(mat=[[2, 0], [-7, 5]])
 
     m1 = Matrix(mat=[
-        [2,-1,0,0],
-        [-1,2,-1,0],
-        [0,-1,2,-1],
-        [0,0,-1,2]
+        [2, -1, 0, 0],
+        [-1, 2, -1, 0],
+        [0, -2, 2, -1],
+        [0, 0, -1, 2]
     ])
-    print(m1.det())
+    print(m1.inv())
 
     # print("Printing out the content")
     # print(mat1, "\n", mat2)
