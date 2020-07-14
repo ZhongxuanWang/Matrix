@@ -7,8 +7,8 @@ import numpy as np
 from numpy import array as arr
 
 
-# TODO: In version1.5, optimize the computation by some regularities
-# TODO: In version2.0, discard the dependence on numpy
+# TODO: In version1.5, optimize the computation
+# TODO: In version2.0, discard the reliance on numpy. Make my own array class!
 
 class Matrix:
     __version__ = '1.1'
@@ -25,10 +25,10 @@ class Matrix:
          [0, -3, 1]]
     )
     example_4d_matrix = arr(
-        [2, -1, 0, 0],
+        [[2, -1, 0, 0],
         [-1, 2, -1, 0],
         [0, -2, 2, -1],
-        [0, 0, -1, 2]
+        [0, 0, -1, 2]]
     )
 
     def __init__(self, mat, shape=None):
@@ -208,7 +208,8 @@ class Matrix:
         for col in range(len(nm[0])):
             if nm[0][col] == 0:
                 continue
-            number_sum += (-1) ** (2 + col) * nm[0][col] * self.__internal_det(np.delete(np.delete(nm, 0, 0), col, 1))
+            number_sum += (-1) ** (2 + col) * nm[0][col] * \
+                          self.__internal_det(np.delete(np.delete(nm, 0, 0), col, 1))
         return number_sum
 
     # def __construct_nm(self, nm, col):
@@ -274,3 +275,6 @@ class Matrix:
     def randint(min, max, shape):
         assert shape[0] > 0 and shape[1] > 0, 'The number of rows and columns must be bigger than 0!'
         return Matrix(mat=np.random.randint(min, max, size=shape))
+
+class Array:
+    pass
