@@ -16,12 +16,28 @@ def main():
     mat5 = Matrix(mat=[[2, 0], [-7, 5]])
 
     m1 = Matrix(mat=[
-        [2, -1, 0, 0],
-        [-1, 2, -1, 0],
-        [0, -2, 2, -1],
-        [0, 0, -1, 2]
+        [3,-1,0],
+        [10,0,5],
+        [2,4,7]
     ])
-    print(m1.__dict__)
+    m1 = Matrix(mat=[
+        [1,-1,2],
+        [2,1,-1],
+        [-1,2,3]
+    ])
+    m1 = Matrix(mat=[
+        [1,2,4,8],
+        [1,3,9,27],
+        [1,4,16,64],
+        [1,5,25,125]
+    ])
+    print(m1.det())
+
+    print('matrix quick input')
+    mat = input('mat:').split('\t')
+    shape = input('shape:').split(',')
+    arr = np.array(mat, dtype='float').reshape(int(shape[0]), int(shape[1]))
+    print(arr)
 
     # print("Printing out the content")
     # print(mat1, "\n", mat2)
