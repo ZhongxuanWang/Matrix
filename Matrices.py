@@ -7,14 +7,11 @@ import numpy as np
 from numpy import array as arr
 
 
-# TODO : INVERSE, COFACTOR, ADJOINT
-
 # TODO: In version1.5, optimize the computation by some regularities
-
 # TODO: In version2.0, discard the dependence on numpy
 
 class Matrix:
-    __version__ = '1.0'
+    __version__ = '1.1'
     __author__ = 'Daniel Wang'
 
     num_of_matrix = 0
@@ -26,6 +23,12 @@ class Matrix:
         [[1, 0, 0],
          [5, 1, 0],
          [0, -3, 1]]
+    )
+    example_4d_matrix = arr(
+        [2, -1, 0, 0],
+        [-1, 2, -1, 0],
+        [0, -2, 2, -1],
+        [0, 0, -1, 2]
     )
 
     def __init__(self, mat, shape=None):
