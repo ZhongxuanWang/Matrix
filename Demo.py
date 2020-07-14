@@ -16,11 +16,12 @@ def main():
     mat5 = Matrix(mat=[[2, 0], [-7, 5]])
 
     m1 = Matrix(mat=[
-        [1, 0, 0],
-        [5, 1, 0],
-        [0, -3, 1]
+        [2,-1,0,0],
+        [-1,2,-1,0],
+        [0,-1,2,-1],
+        [0,0,-1,2]
     ])
-    print(abs(m1))
+    print(m1.det())
 
     # print("Printing out the content")
     # print(mat1, "\n", mat2)

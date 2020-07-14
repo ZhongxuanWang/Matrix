@@ -1,7 +1,6 @@
 """
 Matrix class written by Daniel Wang encapsulating most of the aspects of matrices. Not like Numpy,
 this provides more functions and more user-friendly.
-In 4 words: 闲着无聊
 """
 
 import numpy as np
@@ -10,9 +9,20 @@ from numpy import array as arr
 
 # TODO : INVERSE, COFACTOR, ADJOINT
 
+# TODO: In version1.5, optimize the computation by some regularities
+
+# TODO: In version2.0, discard the dependence on numpy
+
 class Matrix:
+    __version__ = '1.0'
+    __author__ = 'Daniel Wang'
+
     num_of_matrix = 0
-    example_matrix = arr(
+    example_2d_matrix = arr(
+        [[4, 1],
+         [3, 2]]
+    )
+    example_3d_matrix = arr(
         [[1, 0, 0],
          [5, 1, 0],
          [0, -3, 1]]
@@ -25,10 +35,11 @@ class Matrix:
             else:
                 self.mat = arr(mat)
         else:
-            assert shape is not None
+            assert shape is not None, 'When the matrix is not given, the shape cant be empty!'
             self.mat = self.identity(shape)
-        self.nrows = len(mat)
+        self.nrows = self.ndim = len(mat)
         self.ncols = len(mat[0])
+        self.shape = (self.nrows, self.ncols)
 
         Matrix.num_of_matrix += 1
         self.my_num = Matrix.num_of_matrix
@@ -37,7 +48,7 @@ class Matrix:
         return self.__mat
 
     def set_mat(self, other):
-        assert len(other) > 0 and len(other[0]) > 0
+        assert len(other) > 0, 'The matrix cant be empty'
         self.__mat = np.array(other)
 
     mat = property(get_mat, set_mat)
@@ -83,7 +94,7 @@ class Matrix:
         return result
 
     def inv(self):
-        assert self.det() is not 0
+        assert self.det() is not 0, 'only matrix with none-zero determinant have its inverse matrix!'
         row = len(self.mat)
         col = len(self.mat[0])
         # Make sure it's a square
@@ -94,7 +105,7 @@ class Matrix:
         row = len(self.mat)
         col = len(self.mat[0])
         # Make sure it's a square
-        assert row == col
+        assert row == col, 'only squared matrix have determinant!'
         # Edge cases
         if 997 < row < 1000000:
             import sys
@@ -185,6 +196,8 @@ class Matrix:
         if len(nm) == 2:
             return nm[0][0] * nm[1][1] - nm[0][1] * nm[1][0]
         for col in range(len(nm[0])):
+            if nm[0][col] == 0:
+                continue
             number_sum += (-1) ** (2 + col) * nm[0][col] * self.__internal_det(np.delete(np.delete(nm, 0, 0), col, 1))
         return number_sum
 
@@ -203,6 +216,7 @@ class Matrix:
         return new_mat
 
     def __internal_adj(self):
+
         return self.mat
         pass
 
@@ -248,3 +262,14 @@ class Matrix:
         else:
             col, row = dimension[0]
         return row, col
+
+    @staticmethod
+    def rand(shape):
+        nrows, ncols = shape
+        assert nrows > 0 and ncols > 0, 'The number of rows and columns must be bigger than 0!'
+        return Matrix(mat=np.random.randn(nrows, ncols))
+
+    @staticmethod
+    def randint(min, max, shape):
+        assert shape[0] > 0 and shape[1] > 0, 'The number of rows and columns must be bigger than 0!'
+        return Matrix(mat=np.random.randint(min, max, size=shape))
