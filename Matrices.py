@@ -212,8 +212,7 @@ class Matrix:
                 #         np.delete(nm, 0, 0), col, 1)
                 # )
                 number_sum += (-1) ** (2 + col) * nm[0][col] * self.__internal_det(
-                    Matrix.delete(
-                        Matrix.delete(nm, (0, 0)), (col, 1))
+                    Matrix.delete(nm, (0, col))
                 )
         return number_sum
 
@@ -251,26 +250,28 @@ class Matrix:
                 for col in range(ncols):
                     nm[row][col] = (-1) ** (2 + row + col) * \
                                    self.__internal_det(
-                                       Matrix.delete(
-                                           Matrix.delete(nm, (0, 0)), (col, 1))
+                                        Matrix.delete(nm, (0, col))
                                    )
         return nm
 
     @staticmethod
     def delete(mat, loc):
         row, col = loc
-        nrow, ncol = len(mat), len(mat[0])
+        nrow, ncol = len(mat) - 1, len(mat[0]) - 1
         nm = Matrix.fill((nrow, ncol))
-        matcher = (0, 0)
-        for r in mat:
-            for c in mat[r]:
-                if r == row:
-                    matcher[0] -= 1
+        tr = 0
+        tc = 0
+        for i, r in enumerate(mat):
+            for j, c in enumerate(r):
+                if i == row:
+                    tr -= 1
                     break
-                if c == col:
-                    matcher[1] -= 1
+                if j == col:
                     continue
-                nm[r+matcher[0]][c+matcher[1]] = mat[r][c]
+                nm[tr][tc] = c
+                tc += 1
+            tc = 0
+            tr += 1
         return nm
 
     # @staticmethod
