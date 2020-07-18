@@ -16,7 +16,7 @@ def arr(arg):
 # TODO: In version2.1, optimize the computation
 
 class Matrix:
-    __version__ = '2.0'
+    __version__ = '2.0.1'
     __author__ = 'Daniel Wang'
 
     example_2d_matrix = arr(
@@ -284,6 +284,12 @@ class Matrix:
                 tc += 1
             tc = 0
             tr += 1
+        # print('deleted - - - - - - -')
+        # print(mat)
+        # print(loc)
+        # print(nm)
+        # print('deleted - - - - - - - end')
+
         return nm
 
     # @staticmethod
