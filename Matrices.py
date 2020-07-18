@@ -187,7 +187,13 @@ class Matrix:
             # return nm
 
     def __internal_inv(self, det):
-        return self.adj() / det
+        a = self.adj()
+        nm = a.copy()
+        for i, _ in enumerate(a):
+            for j, _ in enumerate(nm[i]):
+                nm[i][j] = a[i][j] / det
+        return nm
+        # return self.adj() / det
 
     """
     Precondition: 
@@ -229,7 +235,9 @@ class Matrix:
             mat = self.mat.copy()
         new_mat = Matrix.zeros((len(mat[0]), len(mat)))
         for a in range(len(mat[0])):
-            new_mat[a] = mat[:, a]
+            # new_mat[a] = mat[:, a]
+            get_col = lambda col: [r[col] for r in mat]
+            new_mat[a] = get_col(a)
         return new_mat
 
     def __internal_adj(self):
@@ -241,16 +249,20 @@ class Matrix:
         if nrows == 1:
             nm[0] = self.mat[0]
         elif nrows == 2:
-            nm[0, 0] = self.mat[1, 1]
-            nm[0, 1] = -self.mat[1, 0]
-            nm[1, 0] = -self.mat[0, 1]
-            nm[1, 1] = self.mat[0, 0]
+            # nm[0, 0] = self.mat[1, 1]
+            # nm[0, 1] = -self.mat[1, 0]
+            # nm[1, 0] = -self.mat[0, 1]
+            # nm[1, 1] = self.mat[0, 0]
+            nm[0][0] = self.mat[1][1]
+            nm[0][1] = -self.mat[1][0]
+            nm[1][0] = -self.mat[0][1]
+            nm[1][1] = self.mat[0][0]
         else:
             for row in range(nrows):
                 for col in range(ncols):
                     nm[row][col] = (-1) ** (2 + row + col) * \
                                    self.__internal_det(
-                                        Matrix.delete(nm, (0, col))
+                                       Matrix.delete(nm, (0, col))
                                    )
         return nm
 

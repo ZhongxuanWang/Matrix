@@ -40,12 +40,12 @@ def main():
         [1,1,1,1,10]
     ])
     print(m1.det())
-
-    print('matrix quick input')
-    mat = input('mat:').split('\t')
-    shape = input('shape:').split(',')
-    arr = np.array(mat, dtype='float').reshape(int(shape[0]), int(shape[1]))
-    mt = Matrix(arr)
+    mt = Matrix(Matrix.example_3d_matrix)
+    # print('matrix quick input')
+    # mat = input('mat:').split('\t')
+    # shape = input('shape:').split(',')
+    # arr = np.array(mat, dtype='float').reshape(int(shape[0]), int(shape[1]))
+    # mt = Matrix(arr)
     print('determinant - - - ')
     print(mt.det(),end='\n\n')
 
