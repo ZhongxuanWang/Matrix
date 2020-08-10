@@ -18,6 +18,7 @@ class Matrix:
         [[4, 1],
          [3, 2]]
     )
+
     example_3d_matrix = arr(
         [[1, 0, 0],
          [5, 1, 0],
