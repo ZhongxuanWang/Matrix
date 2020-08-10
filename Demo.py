@@ -31,29 +31,14 @@ def main():
         [1,4,16,64],
         [1,5,25,125]
     ])
-
-    m1 = Matrix(mat=[
-        [10,1,1,1,1],
-        [1,10,1,1,1],
-        [1,1,10,1,1],
-        [1,1,1,10,1],
-        [1,1,1,1,10]
-    ])
     print(m1.det())
-    mt = Matrix(Matrix.example_3d_matrix)
+    print(m1.inv())
+
     # print('matrix quick input')
     # mat = input('mat:').split('\t')
     # shape = input('shape:').split(',')
     # arr = np.array(mat, dtype='float').reshape(int(shape[0]), int(shape[1]))
-    # mt = Matrix(arr)
-    print('determinant - - - ')
-    print(mt.det(),end='\n\n')
-
-    print('inverse - - - ')
-    print(mt.inv(),end='\n\n')
-
-    print('cofactor - - - ')
-    print(mt.cof(),end='\n\n')
+    # print(arr)
 
     # print("Printing out the content")
     # print(mat1, "\n", mat2)
