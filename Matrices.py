@@ -30,6 +30,7 @@ class Matrix:
          [0, 0, -1, 2]]
     )
 
+
     def __init__(self, mat, shape=None):
         if mat is not None:
             if isinstance(type(mat), type(arr)):
