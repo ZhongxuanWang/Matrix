@@ -3,15 +3,20 @@ Matrix class written by Daniel Wang encapsulating most of the aspects of matrice
 this provides more functions and more user-friendly.
 """
 
-import numpy as np
-from numpy import array as arr
+
+# import numpy as np
+# from numpy import array as arr
 
 
-# TODO: In version1.5, optimize the computation
-# TODO: In version2.0, discard the reliance on numpy. Make my own array class!
+def arr(arg):
+    # For now the numpy array is not used, but it doesn't mean it will never be used.
+    return arg
+
+
+# TODO: In version2.1, optimize the computation
 
 class Matrix:
-    __version__ = '1.1'
+    __version__ = '2.0.1'
     __author__ = 'Daniel Wang'
 
     example_2d_matrix = arr(
@@ -34,10 +39,7 @@ class Matrix:
 
     def __init__(self, mat, shape=None):
         if mat is not None:
-            if isinstance(type(mat), type(arr)):
-                self.mat = mat
-            else:
-                self.mat = arr(mat)
+            self.mat = arr(mat)
         else:
             assert shape is not None, 'When the matrix is not given, the shape cant be empty!'
             self.mat = self.identity(shape)
@@ -51,7 +53,7 @@ class Matrix:
         self.ncols = len(other[0])
         self.shape = (self.nrows, self.ncols)
 
-        self.__mat = np.array(other)
+        self.__mat = arr(other)
 
     mat = property(get_mat, set_mat)
 
@@ -65,7 +67,7 @@ class Matrix:
         return self.__internal_add(other)
 
     def __pow__(self, power, modulo=None):
-        m = self.mat
+        m = self.mat.copy()
         for a in range(power):
             m = self.__internal_dot(m)
         return m
@@ -79,9 +81,6 @@ class Matrix:
 
     def __len__(self):
         return self.nrows
-
-    def to_list(self):
-        return self.mat.tolist()
 
     def dot(self, nm, inplace=False):
         result = self.__internal_dot(nm)
@@ -117,7 +116,7 @@ class Matrix:
             sys.setrecursionlimit(row + 2)
         elif row > limit:
             raise Exception("Row/Col number exceeded limit.")
-        return self.__internal_det(list(self.mat))
+        return self.__internal_det(self.mat)
 
     '''
     Transpose = Interhange row and column
@@ -150,16 +149,16 @@ class Matrix:
             self.mat = cof
         return cof
 
-    """
-    Using matplotlib to plot matrix
-    """
+    def argmax(self):
+        return max(self.mat)
 
-    def matplot(self):
-        pass
+    def argmin(self):
+        return min(self.mat)
 
     # This means a private method
     def __internal_dot(self, nm):
         if isinstance(nm, (int, float, bool)):
+            nm = self.mat.copy()
             return self.mat * nm
         else:
             assert len(self.mat[0]) == len(nm)
@@ -190,7 +189,13 @@ class Matrix:
             # return nm
 
     def __internal_inv(self, det):
-        return self.adj() / det
+        a = self.adj()
+        nm = a.copy()
+        for i, _ in enumerate(a):
+            for j, _ in enumerate(nm[i]):
+                nm[i][j] = a[i][j] / det
+        return nm
+        # return self.adj() / det
 
     """
     Precondition: 
@@ -202,13 +207,21 @@ class Matrix:
 
     def __internal_det(self, nm):
         number_sum = 0
-        if len(nm) == 2:
+        if len(nm) == 1:
+            return nm[0]
+        elif len(nm) == 2:
             return nm[0][0] * nm[1][1] - nm[0][1] * nm[1][0]
-        for col in range(len(nm[0])):
-            if nm[0][col] == 0:
-                continue
-            number_sum += (-1) ** (2 + col) * nm[0][col] * \
-                          self.__internal_det(np.delete(np.delete(nm, 0, 0), col, 1))
+        else:
+            for col in range(len(nm[0])):
+                if nm[0][col] == 0:
+                    continue
+                # number_sum += (-1) ** (2 + col) * nm[0][col] * self.__internal_det(
+                #     np.delete(
+                #         np.delete(nm, 0, 0), col, 1)
+                # )
+                number_sum += (-1) ** (2 + col) * nm[0][col] * self.__internal_det(
+                    Matrix.delete(nm, (0, col))
+                )
         return number_sum
 
     # def __construct_nm(self, nm, col):
@@ -221,10 +234,12 @@ class Matrix:
 
     def __internal_transpose(self, mat):
         if mat is None:
-            mat = self.mat
+            mat = self.mat.copy()
         new_mat = Matrix.zeros((len(mat[0]), len(mat)))
         for a in range(len(mat[0])):
-            new_mat[a] = mat[:, a]
+            # new_mat[a] = mat[:, a]
+            get_col = lambda col: [r[col] for r in mat]
+            new_mat[a] = get_col(a)
         return new_mat
 
     def __internal_adj(self):
@@ -233,11 +248,56 @@ class Matrix:
     def __internal_cof(self):
         nrows, ncols = len(self.mat), len(self.mat[0])
         nm = Matrix.fill((nrows, ncols), 0)
-        for row in range(nrows):
-            for col in range(ncols):
-                nm[row][col] = (-1) ** (2 + row + col) * \
-                               self.__internal_det(np.delete(np.delete(self.mat, row, 0), col, 1))
+        if nrows == 1:
+            nm[0] = self.mat[0]
+        elif nrows == 2:
+            # nm[0, 0] = self.mat[1, 1]
+            # nm[0, 1] = -self.mat[1, 0]
+            # nm[1, 0] = -self.mat[0, 1]
+            # nm[1, 1] = self.mat[0, 0]
+            nm[0][0] = self.mat[1][1]
+            nm[0][1] = -self.mat[1][0]
+            nm[1][0] = -self.mat[0][1]
+            nm[1][1] = self.mat[0][0]
+        else:
+            for row in range(nrows):
+                for col in range(ncols):
+                    nm[row][col] = (-1) ** (2 + row + col) * \
+                                   self.__internal_det(
+                                       Matrix.delete(nm, (0, col))
+                                   )
         return nm
+
+    @staticmethod
+    def delete(mat, loc):
+        row, col = loc
+        nrow, ncol = len(mat) - 1, len(mat[0]) - 1
+        nm = Matrix.fill((nrow, ncol))
+        tr = 0
+        tc = 0
+        for i, r in enumerate(mat):
+            for j, c in enumerate(r):
+                if i == row:
+                    tr -= 1
+                    break
+                if j == col:
+                    continue
+                nm[tr][tc] = c
+                tc += 1
+            tc = 0
+            tr += 1
+        # print('deleted - - - - - - -')
+        # print(mat)
+        # print(loc)
+        # print(nm)
+        # print('deleted - - - - - - - end')
+
+        return nm
+
+    # @staticmethod
+    # def reshape(mat, newshape):
+    #     ncols, nrows = newshape
+    #     nm = Matrix.fill(newshape)
 
     @staticmethod
     def identity(shape):
@@ -265,16 +325,16 @@ class Matrix:
         return Matrix.fill(shape, content=1)
 
     @staticmethod
-    def rand(shape):
-        nrows, ncols = shape
-        assert nrows > 0 and ncols > 0, 'The number of rows and columns must be bigger than 0!'
-        return Matrix(mat=np.random.randn(nrows, ncols))
+    def flatten(mat):
+        return [item for sublist in mat for item in sublist]
 
-    @staticmethod
-    def randint(min, max, shape):
-        assert shape[0] > 0 and shape[1] > 0, 'The number of rows and columns must be bigger than 0!'
-        return Matrix(mat=np.random.randint(min, max, size=shape))
-
-
-class Array:
-    pass
+    # @staticmethod
+    # def rand(shape):
+    #     nrows, ncols = shape
+    #     assert nrows > 0 and ncols > 0, 'The number of rows and columns must be bigger than 0!'
+    #     return Matrix(mat=np.random.randn(nrows, ncols))
+    #
+    # @staticmethod
+    # def randint(min, max, shape):
+    #     assert shape[0] > 0 and shape[1] > 0, 'The number of rows and columns must be bigger than 0!'
+    #     return Matrix(mat=np.random.randint(min, max, size=shape))
